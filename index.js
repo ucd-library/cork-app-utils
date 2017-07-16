@@ -4,5 +4,6 @@ module.exports = {
   EventController : require('./lib/EventController'),
   ReduxStore : require('./lib/redux/store'),
   ReduxCombineReducers : require('redux').combineReducers,
-  ReduxObserver : require('redux-observers').observer
+  ReduxObserver : require('redux-observers').observer,
+  ReduxAPIMiddleware : require('./lib/redux/middleware/api')
 }
