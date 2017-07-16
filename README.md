@@ -23,7 +23,6 @@ The EventController is a base class for controllers which adds helpers for bindi
 ### Attributes
   
   - eventBus : EventBus
-  - observer : redux-observer
 
 ### Methods
 

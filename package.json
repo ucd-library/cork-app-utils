@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "redux": "^3.7.2",
-    "redux-observer": "^1.0.0",
     "redux-observers": "^2.0.2"
   }
 }
