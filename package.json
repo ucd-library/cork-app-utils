@@ -1,0 +1,15 @@
+{
+  "name": "cork-app-utils",
+  "version": "1.0.0",
+  "description": "Base classes for wiring client app code to redux and event framework ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Justin Merz <jrmerz@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "redux": "^3.7.2",
+    "redux-observers": "^2.0.2"
+  }
+}
