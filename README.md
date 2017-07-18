@@ -56,10 +56,6 @@ class MyController extends EventController {
       get : 'get-event'
     }
 
-    this.triggerEvents = {
-      updateEvent : 'on-update'
-    }
-
     this.bind();
   }
 
@@ -75,14 +71,6 @@ class MyController extends EventController {
    **/
   get() {
     return model.get();
-  }
-
-  /**
-   * Should be called from your redux observer function.
-   * Sends observed state change to EventBus
-   **/
-  updateObserver(state) {
-    this.emit(this.triggerEvents.updateEvent, state);
   }
 }
 
