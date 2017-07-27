@@ -8,5 +8,7 @@
   },
   "author": "Justin Merz <jrmerz@gmail.com>",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "superagent": "^3.5.2"
+  }
 }
