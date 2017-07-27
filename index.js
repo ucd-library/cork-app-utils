@@ -3,5 +3,6 @@ module.exports = {
   BaseModel : require('./lib/BaseModel'),
   BaseStore : require('./lib/BaseStore'),
   BaseService : require('./lib/BaseService'),
-  StoreServiceWrapper : require('./lib/StoreServiceWrapper')
+  StoreServiceWrapper : require('./lib/StoreServiceWrapper'),
+  request : require('superagent')
 }
