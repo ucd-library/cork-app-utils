@@ -4,5 +4,6 @@ module.exports = {
   BaseStore : require('./lib/BaseStore'),
   BaseService : require('./lib/BaseService'),
   StoreServiceWrapper : require('./lib/StoreServiceWrapper'),
+  IocRegistration : require('./lib/IocRegistration'),
   request : require('superagent')
 }
