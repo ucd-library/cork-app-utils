@@ -1,6 +1,6 @@
 {
   "name": "cork-app-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Base classes for wiring client app code to redux and event framework ",
   "main": "index.js",
   "scripts": {
