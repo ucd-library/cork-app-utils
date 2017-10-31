@@ -1,6 +1,6 @@
 {
   "name": "cork-app-utils",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Base classes for wiring client app code to redux and event framework ",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "Justin Merz <jrmerz@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "superagent": "^3.5.2"
+    "request": "^2.83.0"
   }
 }
