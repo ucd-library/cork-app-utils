@@ -1,6 +1,6 @@
 {
   "name": "@ucd-lib/cork-app-utils",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Base classes for wiring client app code to redux and event framework ",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "Justin Merz <jrmerz@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.83.0"
+    "isomorphic-fetch": "^2.2.1"
   }
 }

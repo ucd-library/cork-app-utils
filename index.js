@@ -4,5 +4,5 @@ module.exports = {
   BaseService : require('./lib/BaseService'),
   Mixin : require('./lib/Mixin'),
   EventInterface : require('./lib/EventInterface'),
-  request : require('request')
+  fetch : require('isomorphic-fetch')
 }
