@@ -1,6 +1,6 @@
 {
   "name": "@ucd-lib/cork-app-utils",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Base classes for wiring client app code to redux and event framework ",
   "main": "index.js",
   "scripts": {
