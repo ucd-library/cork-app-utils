@@ -1,202 +1,260 @@
 # BaseModel
 
-The BaseModel exposes the ReduxStore and EventBus to classes as well as adds helper methods for access redux state, emiting events and listening for events from the event bus.
+The BaseModel exposes the event bus and has helper methods
+for registering with the MasterController.  This global object
+is used by Element interface mixins to inject the models into
+elements.
 
 ### Attributes
 
- - store : ReduxStore
  - eventBus : EventBus
 
 ### Methods
 
- - bindMethods()
-   - create listeners on event bus.  events names will be [Classname].[methodname]
+ - register(name: String)
+   - Register model with the MasterController
  - emit(event: String, payload: Object)
    - Emit event to event bus
- - dispatch(action: Object)
-   - Dispatch action to ReduxStore
- - getState()
-   - Shortcut for access ReduxStore state
 
 ### Example Usage
 
 ```javascript
-var BaseModel = require('cork-app-utils').BaseModel;
-var actions = require('../redux/actions/example');
+const {BaseModel} = require('cork-app-utils');
+const ExampleStore = require('../stores/ExampleStore');
+const ExampleService = require('../service/ExampleService');
 
 class ExampleModel extends BaseModel {
 
   constructor() {
     super();
 
-    // adds listeners for events 'ExampleModel.get' and 'ExampleModel.set'
-    // to the eventBus.
-    this.bindMethods();
+    this.store = ExampleStore;
+    this.service = ExampleService;
+
+    this.register('ExampleModel');
   }
 
   /**
-   * Get the current redux state
+   * @method get
+   * @description In this example we will fetch some data
+   * using our service.  The service may return some
+   * data already cached in the store.  The returned 
+   * data will be in a State Payload Wrapper.
    *
-   * @returns {Object} example state
+   * @returns {Promise}
    */
-  get() {
-    return this.getState().example;
+  async get(id) {
+    // wait for the service to do it's thing
+    // if you are interested in the loading events
+    // you will want to set event listeners
+    await this.service.get(id);
+
+    return this.store.get(id);
   }
 
   /**
-   * Update the example state
-   *
-   * @returns {Object} update - keys to be updated
+   * @method set
+   * @description Update some app state
    */
-  set(update) {
-    this.dispatch(
-      actions.updateState(update)
-    )
-
-    return this.getState().appState;
+  set(data) {
+    this.store.update(data)
   }
 }
 
 module.exports = new ExampleModel();
 ```
-# EventBus
 
-Global instance of EventEmitter class.
+# BaseService
+
+The BaseService exposes helper functions to call rest services
+
+### Attributes
+
+ - eventBus : EventBus
+
+### Methods
+
+ - request(options: Object)
+   - Make a fetch request
+
+### Example Usage
+
+```javascript
+const {BaseService} = require('cork-app-utils');
+const ExampleStore = require('../stores/ExampleStore');
+
+class ExampleService extends BaseService {
+
+  constructor() {
+    super();
+
+    this.store = ExampleStore;
+  }
+
+  async get(id) {
+    return this.request({
+      url : `/api/get/${id}`,
+      checkCached : () => this.store.data.byId[id],
+      onLoading : request => this.store.setLoading(id, request),
+      onLoad : result => this.store.setLoaded(id, result.body),
+      onError : e => this.store.setError(id, e)
+    });
+  }
+}
+
+module.exports = new ExampleService();
+```
+
+# BaseStore
+
+The ServiceModel exposes helper functions to call rest services
+
+### Attributes
+
+ - eventBus : EventBus
+
+### Methods
+
+ - request(options: Object)
+   - Make a fetch request
+
+### Example Usage
+
+```javascript
+const {BaseStore} = require('cork-app-utils');
+
+class ExampleStore extends BaseStore {
+
+  constructor() {
+    super();
+
+    this.data = {
+      byId : {}
+    }
+
+    this.events = {
+      EXAMPLE_UPDATE = 'example-update'
+    }
+  }
+
+  setLoading(id, promise) {
+    this._setState({
+      state: this.STATE.LOADING, 
+      id: id,
+      request : promise
+    });
+  }
+
+  setLoaded(id, payload) {
+    this._setState({
+      state: this.STATE.LOADED,   
+      id: id,
+      payload: payload
+    });
+  }
+
+  setError(id, e) {
+    this._setState({
+      state: this.STATE.ERROR,   
+      id: id,
+      error: e
+    });
+  }
+
+  _setState(id, state) {
+    this.data.byId[id] = state
+    this.emit(this.events.EXAMPLE_UPDATE, state);
+  }
+}
+
+module.exports = new ExampleStore();
+```
+
+
+# MasterController
+
+Global instance of EventEmitter class with map of model names
+to model instances.
 
 # Wiring to UI
 
 This example will use Polymer and the [cork-common-utils](https://github.com/cork-elements/cork-common-utils) elements
 to create a mixin class (interface) that can be added to multiple elements.
 
-## Mixin Class Creation
+## Interface Mixin Class Creation
 
-```html
-<script>
-  const ExampleMixin = subclass => 
+```js
 
-  class ExampleController extends subclass {
+module.exports = subclass => 
 
-      // we will go over this below, this will listen to events from redux-observer
-      get bind() {
-        return Object.assign(
-          super.bind,
-          {
-            'example-update' : '_onExampleUpdate'
-          }
-        );
+  class ExampleInterface extends subclass {
+
+      constructor() {
+        this._injectModel('ExampleModel');
       }
 
-      _setExample(state) {
-        return this.emit('ExampleModel.set', state);
+      _setExample(update) {
+        this.ExampleModel.update(update);
       }
 
-      _getExample() {
-        return this.emit('ExampleModel.get');
+      async _getExample(id) {
+        return this.ExampleModel.get(id);
       }
 
+      // automatically binds element to example-update event.
       _onExampleUpdate(e) {
         // implement me
       }
   }
-</script>
 ```
 
-## Using mixin with Polymer 2.0 element
-
-```html
-<dom-module id="my-element">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-
-    <div>[[exampleStateStr]]</div>
-    
-  </template>
-  <script>
-    // cork-common-utils has elements for 'Mixin' and 'EventMixin'
-    class MyElement extends 
-      Mixin(Polymer.Element)
-      .with(EventMixin, ExampleMixin) {
-
-      static get is(){ return 'my-element' }
-
-      static get properties() {
-        return {
-            exampleStateStr : {
-              type : String,
-              value : ''
-            }
-          }
-      }
-
-      ready() {
-        this._getExample().then(state => this._onExampleUpdate(state));
-      }
-
-      _onExampleUpdate(exampleState) {
-        this.exampleStateStr = JSON.stringify(exampleState);
-      }
-
-      _setExample() {
-        super._setExample({
-          my : 'new state'
-        });
-      }
-    }
-    window.customElements.define(MyElement.is, MyElement);
-  </script>
-</dom-module>
-```
-
-## Using redux-observers to fire events
-
-Create a event emitter.  Not required, but it's nice to have all these events defined somewhere
+## Using mixin with Polymer 3.0 element
 
 ```js
-var EventBus = require('cork-app-utils').EventBus;
+import {Element as PolymerElement} from "@polymer/polymer/polymer-element"
 
-class ObserverEventEmitter {
+// sets globals Mixin and EventInterface
+import "@ucd-lib/cork-app-utils";
 
-  static onExampleChange(state) {
-    EventBus.emit('example-update', state);
+import ExampleInterface from "./interfaces/ExampleInterface"
+
+export default class MyElement extends Mixin(Polymer.Element)
+  .with(EventInterface, ExampleInterface) {
+
+  constructor() {
+    // by default all EventInterface elements have an active flag
+    // that is set to false.  This flag must be set to true to 
+    // or all store events will be ignored.  You can use iron-pages
+    // or the like to be more clever with this flag and control
+    // when elements are active and responding to events.
+    this.active = true;
+  }
+
+  render(id) {
+    // _getExample added from ExampleInterface
+    let data = await this._getExample('someId');
+    // you can do stuff with
+  }
+
+  // EventInterface will automatically wire up this method
+  // to the example-update event.
+  _onExampleUpdate(e) {
+    if( e.state === 'loading' ) {
+
+    } else if( e.state === 'loaded' ) {
+
+    } else if( e.state === 'error' ) {
+
+    }
+  }
+
+  _setExample() {
+    this._setExample({
+      my : 'new state'
+    });
   }
 }
 
-module.exports = ObserverEventEmitter;
+customElements.define('my-element', MyElement);
 ```
 
-Create an observer
-
-```js
-var observer = require('cork-app-utils').ReduxObserver;
-var ObserverEventEmitter = require('./ObserverEventEmitter');
-
-var example = observer(
-  (state) => state.example,
-  (dispatch, current, previous) => {
-    ObserverEventEmitter.onExampleChange(current);
-  }
-);
-
-module.exports = [example];
-```
-
-Finally, wire up redux
-
-```js
-var store = require('cork-app-utils').ReduxStore;
-// should be return value of combineReducers, you can access via 
-// var combineReducers = require('cork-app-utils').ReduxCombineReducers
-var reducers = require('./redux/reducers');
-// should be an array of observers
-var observers = require('./redux/observers');
-// should be an array of middleware
-var middleware = require('./redux/middleware');
-
-// initialize redux store
-// all Models extending the BaseModel have access to this store.
-store({reducers, observers, middleware});
-```

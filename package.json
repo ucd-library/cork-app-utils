@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "cork-app-utils": "bin/cli.js"
+  },
   "author": "Justin Merz <jrmerz@gmail.com>",
   "license": "ISC",
   "dependencies": {
