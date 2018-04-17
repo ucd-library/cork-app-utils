@@ -221,15 +221,6 @@ import ExampleInterface from "./interfaces/ExampleInterface"
 export default class MyElement extends Mixin(Polymer.Element)
   .with(EventInterface, ExampleInterface) {
 
-  constructor() {
-    // by default all EventInterface elements have an active flag
-    // that is set to false.  This flag must be set to true to 
-    // or all store events will be ignored.  You can use iron-pages
-    // or the like to be more clever with this flag and control
-    // when elements are active and responding to events.
-    this.active = true;
-  }
-
   render(id) {
     // _getExample added from ExampleInterface
     let data = await this._getExample('someId');
