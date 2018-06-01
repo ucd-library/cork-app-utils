@@ -47,8 +47,17 @@ class ExampleModel extends BaseModel {
     // wait for the service to do it's thing
     // if you are interested in the loading events
     // you will want to set event listeners
-    await this.service.get(id);
+    try {
+      // the return from the service is the network respons
+      // not the state response which is stored in the store
+      await this.service.get(id);
+    } catch(e) {
+      // handle network error here if you want
+      // but error state should be capture by store
+    }
 
+    // regardless of the network success/failure of request above
+    // return the current state
     return this.store.get(id);
   }
 
@@ -94,6 +103,10 @@ class ExampleService extends BaseService {
   async get(id) {
     return this.request({
       url : `/api/get/${id}`,
+      // optional
+      // if the state is 'loading' and another request for this object
+      // comes in, both requests will wait on the same promise preventing
+      // two network requests for the same object
       checkCached : () => this.store.data.byId[id],
       onLoading : request => this.store.setLoading(id, request),
       onLoad : result => this.store.setLoaded(id, result.body),
@@ -137,6 +150,9 @@ class ExampleStore extends BaseStore {
     }
   }
 
+  // promise is the network request promise
+  // always store this so we can wait on it if a second
+  // entity requests this same resource
   setLoading(id, promise) {
     this._setState({
       state: this.STATE.LOADING, 
@@ -148,21 +164,20 @@ class ExampleStore extends BaseStore {
   setLoaded(id, payload) {
     this._setState({
       state: this.STATE.LOADED,   
-      id: id,
-      payload: payload
+      id, payload
     });
   }
 
-  setError(id, e) {
+  setError(id, error) {
     this._setState({
       state: this.STATE.ERROR,   
-      id: id,
-      error: e
+      id, error
     });
   }
 
   _setState(id, state) {
     // optionally check that state has actually changed
+    // this is helpful to prevent multiple events of same state that sometimes occur
     // if( !this.stateChanged(this.data.byId[id], state) ) return;
 
     this.data.byId[id] = state
@@ -179,10 +194,8 @@ module.exports = new ExampleStore();
 Global instance of EventEmitter class with map of model names
 to model instances.
 
-# Wiring to UI
+# Wiring to UI with Interface
 
-This example will use Polymer and the [cork-common-utils](https://github.com/cork-elements/cork-common-utils) elements
-to create a mixin class (interface) that can be added to multiple elements.
 
 ## Interface Mixin Class Creation
 
@@ -214,7 +227,7 @@ module.exports = subclass =>
 ## Using mixin with Polymer 3.0 element
 
 ```js
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element"
+import {PolymerElement} from "@polymer/polymer"
 
 // sets globals Mixin and EventInterface
 import "@ucd-lib/cork-app-utils";
@@ -252,3 +265,48 @@ export default class MyElement extends Mixin(Polymer.Element)
 customElements.define('my-element', MyElement);
 ```
 
+# Wiring UI directly (no interface)
+
+```js
+import {PolymerElement} from "@polymer/polymer"
+
+// sets globals Mixin and EventInterface
+import "@ucd-lib/cork-app-utils";
+
+import ExampleModel from "../lib/models/ExampleModel"
+
+export default class MyElement extends Mixin(Polymer.Element)
+  .with(EventInterface) {
+
+  constructor() {
+    super();
+    this._injectModel(ExampleModel);
+  }
+
+  render(id) {
+    // _getExample added from ExampleInterface
+    let data = await ExampleModel.get('someId');
+    // you can do stuff with
+  }
+
+  // EventInterface will automatically wire up this method
+  // to the example-update event.
+  _onExampleUpdate(e) {
+    if( e.state === 'loading' ) {
+
+    } else if( e.state === 'loaded' ) {
+
+    } else if( e.state === 'error' ) {
+
+    }
+  }
+
+  _setExample() {
+    ExampleModel.set({
+      my : 'new state'
+    });
+  }
+}
+
+customElements.define('my-element', MyElement);
+```
