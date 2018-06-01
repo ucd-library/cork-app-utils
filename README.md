@@ -162,6 +162,9 @@ class ExampleStore extends BaseStore {
   }
 
   _setState(id, state) {
+    // optionally check that state has actually changed
+    // if( !this.stateChanged(this.data.byId[id], state) ) return;
+
     this.data.byId[id] = state
     this.emit(this.events.EXAMPLE_UPDATE, state);
   }
