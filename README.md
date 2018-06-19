@@ -234,7 +234,7 @@ import "@ucd-lib/cork-app-utils";
 
 import ExampleInterface from "./interfaces/ExampleInterface"
 
-export default class MyElement extends Mixin(Polymer.Element)
+export default class MyElement extends Mixin(PolymerElement)
   .with(EventInterface, ExampleInterface) {
 
   render(id) {
@@ -273,19 +273,17 @@ import {PolymerElement} from "@polymer/polymer"
 // sets globals Mixin and EventInterface
 import "@ucd-lib/cork-app-utils";
 
-import ExampleModel from "../lib/models/ExampleModel"
-
-export default class MyElement extends Mixin(Polymer.Element)
+export default class MyElement extends Mixin(PolymerElement)
   .with(EventInterface) {
 
   constructor() {
     super();
-    this._injectModel(ExampleModel);
+    this._injectModel('ExampleModel');
   }
 
   render(id) {
     // _getExample added from ExampleInterface
-    let data = await ExampleModel.get('someId');
+    let data = await this.ExampleModel.get('someId');
     // you can do stuff with
   }
 
@@ -302,7 +300,51 @@ export default class MyElement extends Mixin(Polymer.Element)
   }
 
   _setExample() {
-    ExampleModel.set({
+    this.ExampleModel.set({
+      my : 'new state'
+    });
+  }
+}
+
+customElements.define('my-element', MyElement);
+```
+
+# Wiring class directly (no interface)
+
+```js
+// sets globals Mixin and EventInterface
+import "@ucd-lib/cork-app-utils";
+
+// use the window scoped BaseMixin class if not extending polymer element
+export default class MyElement extends Mixin(BaseMixin)
+  .with(EventInterface) {
+
+  constructor() {
+    super();
+    this._injectModel('ExampleModel');
+    this.ready(); // manually call ready method
+  }
+
+  render(id) {
+    // _getExample added from ExampleInterface
+    let data = await this.ExampleModel.get('someId');
+    // you can do stuff with
+  }
+
+  // EventInterface will automatically wire up this method
+  // to the example-update event.
+  _onExampleUpdate(e) {
+    if( e.state === 'loading' ) {
+
+    } else if( e.state === 'loaded' ) {
+
+    } else if( e.state === 'error' ) {
+
+    }
+  }
+
+  _setExample() {
+    this.ExampleModel.set({
       my : 'new state'
     });
   }
