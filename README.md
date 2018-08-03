@@ -1,7 +1,7 @@
 # BaseModel
 
 The BaseModel exposes the event bus and has helper methods
-for registering with the MasterController.  This global object
+for registering with the global model registry.  This global object
 is used by Element interface mixins to inject the models into
 elements.
 
@@ -12,7 +12,7 @@ elements.
 ### Methods
 
  - register(name: String)
-   - Register model with the MasterController
+   - Register the model
  - emit(event: String, payload: Object)
    - Emit event to event bus
 
@@ -189,10 +189,9 @@ module.exports = new ExampleStore();
 ```
 
 
-# MasterController
+# EventBust
 
-Global instance of EventEmitter class with map of model names
-to model instances.
+Global instance of EventEmitter class.
 
 # Wiring to UI with Interface
 

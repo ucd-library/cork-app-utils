@@ -4,7 +4,7 @@ module.exports = {
   BaseService : require('./lib/BaseService'),
   BaseMixin : require('./lib/BaseMixin'),
   Mixin : require('./lib/Mixin'),
-  MasterController : require('./lib/MasterController'),
+  EventBus : require('./lib/EventBus'),
   EventInterface : require('./lib/EventInterface'),
   fetch : require('isomorphic-fetch')
 }
