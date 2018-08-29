@@ -6,5 +6,6 @@ module.exports = {
   Mixin : require('./lib/Mixin'),
   EventBus : require('./lib/EventBus'),
   EventInterface : require('./lib/EventInterface'),
-  fetch : require('isomorphic-fetch')
+  fetch : require('isomorphic-fetch'),
+  LightDom : require('./lib/LightDom')
 }
