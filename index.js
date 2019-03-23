@@ -6,6 +6,7 @@ module.exports = {
   Mixin : require('./lib/Mixin'),
   EventBus : require('./lib/EventBus'),
   EventInterface : require('./lib/EventInterface'),
+  LitCorkUtils : require('./lib/LitCorkUtils'),
   fetch : require('isomorphic-fetch'),
   LightDom : require('./lib/LightDom')
 }
