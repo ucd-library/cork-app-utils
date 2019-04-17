@@ -1,3 +1,9 @@
+# Install
+
+```bash
+npm i -s @ucd-lib/cork-app-utils 
+```
+
 # BaseModel
 
 The BaseModel exposes the event bus and has helper methods
@@ -19,7 +25,7 @@ elements.
 ### Example Usage
 
 ```javascript
-const {BaseModel} = require('cork-app-utils');
+const {BaseModel} = require('@ucd-lib/cork-app-utils');
 const ExampleStore = require('../stores/ExampleStore');
 const ExampleService = require('../service/ExampleService');
 
@@ -89,7 +95,7 @@ The BaseService exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-const {BaseService} = require('cork-app-utils');
+const {BaseService} = require('@ucd-lib/cork-app-utils');
 const ExampleStore = require('../stores/ExampleStore');
 
 class ExampleService extends BaseService {
@@ -134,7 +140,7 @@ The ServiceModel exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-const {BaseStore} = require('cork-app-utils');
+const {BaseStore} = require('@ucd-lib/cork-app-utils');
 
 class ExampleStore extends BaseStore {
 
