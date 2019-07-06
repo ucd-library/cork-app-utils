@@ -4,19 +4,15 @@ const tplDir = path.join(__dirname, 'templates');
 
 const defs = [
   {
-    toDir : path.join('elements', 'interfaces'),
-    type : 'interface'
-  },
-  {
-    toDir : path.join('lib', 'models'),
+    toDir : 'models',
     type : 'model'
   },
   {
-    toDir : path.join('lib', 'services'),
+    toDir :'services',
     type : 'service'
   },
   {
-    toDir : path.join('lib', 'stores'),
+    toDir : 'stores',
     type : 'store'
   },
 ]
@@ -39,7 +35,7 @@ async function mkFile(name, dir, def) {
 
   let jsTypeName = def.type;
   jsTypeName = toCapCase(jsTypeName);
-console.log(jsTypeName);
+  console.log(jsTypeName);
 
   let toFile = path.join(toDir, name+jsTypeName+'.js');
   console.log(toFile);
