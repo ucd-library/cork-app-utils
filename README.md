@@ -50,16 +50,30 @@ class ExampleModel extends BaseModel {
    * @returns {Promise}
    */
   async get(id) {
+    // get current state
+    let state = this.store.get(id);
+
     // wait for the service to do it's thing
     // if you are interested in the loading events
     // you will want to set event listeners
     try {
-      // the return from the service is the network respons
-      // not the state response which is stored in the store
-      await this.service.get(id);
+
+      // check to see if we are already loading this resource
+      if( state.state === 'loading' ) {
+        // make sure you store the request promise in the store as 'request'
+        // then you can await here on it as a semaphore, preventing duplicate 
+        // requests if multiple UI elements request a resource at the same time
+        await state.request;
+      } else {
+        // the return from the service is the network respons
+        // not the state response which is stored in the store
+        await this.service.get(id);
+      }
+
     } catch(e) {
-      // handle network error here if you want
-      // but error state should be capture by store
+      // handle network error here if you want to handle in model
+      // but error state should be capture by store and UI elements 
+      // should react to the error state event
     }
 
     // regardless of the network success/failure of request above
@@ -114,6 +128,7 @@ class ExampleService extends BaseService {
       // comes in, both requests will wait on the same promise preventing
       // two network requests for the same object
       checkCached : () => this.store.data.byId[id],
+      // request is a promise to resolves when network request finished (success or failure)
       onLoading : request => this.store.setLoading(id, request),
       onLoad : result => this.store.setLoaded(id, result.body),
       onError : e => this.store.setError(id, e)
@@ -156,14 +171,13 @@ class ExampleStore extends BaseStore {
     }
   }
 
-  // promise is the network request promise
+  // request is the network request promise
   // always store this so we can wait on it if a second
   // entity requests this same resource
-  setLoading(id, promise) {
+  setLoading(id, request) {
     this._setState({
       state: this.STATE.LOADING, 
-      id: id,
-      request : promise
+      id, request
     });
   }
 
