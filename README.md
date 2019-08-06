@@ -1,3 +1,11 @@
+# Cork App Utils
+
+- [Install](#Install)
+- [BaseModel](#BaseModel)
+- [BaseService](#BaseService)
+- [BaseStore](#BaseStore)
+- [EventBus](#EventBus)
+
 # Install
 
 ```bash
@@ -209,7 +217,7 @@ module.exports = new ExampleStore();
 ```
 
 
-# EventBust
+# EventBus
 
 Global instance of EventEmitter class.
 
