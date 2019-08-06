@@ -1,11 +1,11 @@
 # Cork App Utils
 
-- [Install](#Install)
-- [BaseModel](#BaseModel)
-- [BaseService](#BaseService)
-- [BaseStore](#BaseStore)
-- [EventBus](#EventBus)
-- [Wiring to UI](#Wiring-to-UI)
+- [Install](#install)
+- [BaseModel](#basemodel)
+- [BaseService](#baseservice)
+- [BaseStore](#basestore)
+- [EventBus](#eventbus)
+- [Wiring to UI](#wiring-to-ui)
 
 # Install
 
@@ -245,12 +245,11 @@ export default class MyElement extends Mixin(LitElement)
   }
 
   showData(id) {
-    // _getExample added from ExampleInterface
     let data = await this.ExampleModel.get('someId');
     // you can do stuff with
   }
 
-  // EventInterface will automatically wire up this method
+  // LitCorkUtils will automatically wire up this method
   // to the example-update event.
   _onExampleUpdate(e) {
     if( e.state === 'loading' ) {
