@@ -5,7 +5,7 @@
 - [BaseService](#BaseService)
 - [BaseStore](#BaseStore)
 - [EventBus](#EventBus)
-- [Wiring to UI](#Wiring%20to%20UI)
+- [Wiring to UI](#Wiring-to-UI)
 
 # Install
 
