@@ -5,6 +5,7 @@
 - [BaseService](#BaseService)
 - [BaseStore](#BaseStore)
 - [EventBus](#EventBus)
+- [Wiring to UI](#Wiring%20to%20UI)
 
 # Install
 
@@ -222,8 +223,7 @@ module.exports = new ExampleStore();
 Global instance of EventEmitter class.
 
 
-# Wiring Model to UI
-
+# Wiring to UI
 
 ## LitElement
 
