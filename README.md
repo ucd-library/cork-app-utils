@@ -244,7 +244,7 @@ export default class MyElement extends Mixin(LitElement)
     this._injectModel('ExampleModel');
   }
 
-  render(id) {
+  showData(id) {
     // _getExample added from ExampleInterface
     let data = await this.ExampleModel.get('someId');
     // you can do stuff with
