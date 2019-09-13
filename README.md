@@ -6,12 +6,17 @@
 - [BaseStore](#basestore)
 - [EventBus](#eventbus)
 - [Wiring to UI](#wiring-to-ui)
+- [CLI](#cli)
 
 # Install
 
 ```bash
 npm i -s @ucd-lib/cork-app-utils 
 ```
+
+# Overview
+
+![workflow](./cork-app-utils-workflow.png)
 
 # BaseModel
 
@@ -386,3 +391,44 @@ export default class MyElement extends Mixin(PolymerElement)
 
 customElements.define('my-element', MyElement);
 ```
+
+# CLI
+
+Install cork-app-utils globally
+
+```bash
+npm i -g @ucd-lib/cork-app-utils 
+```
+
+The command line utility has two main helpers:
+
+## Model Template
+
+In the src or lib directory or your client code, run:
+
+```
+cork-app-utils model example
+```
+
+It will create the following files (and folders if they do not exist):
+
+ - lib/models/ExampleModel.js
+ - lib/services/ExampleService.js
+ - lib/stores/ExampleStore.js
+
+With boiler plate wiring code already in place.
+
+## Lit Element Template
+
+In the directory you wish to create a new element run:
+
+```
+cork-app-utils lit my-element
+```
+
+This will create the following files:
+
+ - my-element.js
+ - my-element.tpl.js
+
+Where the .js file contains the main element definition and .tpl.js contains the template tag.  There is nothing specific to cork-app-utils in the Lit template other than the way we like to split the elements into two files.  To bind a Lit Element to a stores events, see the Lit Element section in [Wiring to UI](#wiring-to-ui).
