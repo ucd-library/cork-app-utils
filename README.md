@@ -52,6 +52,13 @@ class ExampleModel extends BaseModel {
     this.service = ExampleService;
 
     this.register('ExampleModel');
+
+    // If you want to add other models
+    // this.inject('AnotherModel');
+    // Make sure in your main index.js file to call
+    // import {Registry} from '@ucd-lib/cork-app-utils';
+    // // import models
+    // Registry.ready();
   }
 
   /**
@@ -106,6 +113,29 @@ class ExampleModel extends BaseModel {
 
 const exampleModel = new ExampleModel();
 export default exampleModel;
+```
+
+## Loading Models
+
+Here is a sample `index.js` file for the `./src` folder.  Where `./src` contains `./src/models`, `./src/services`, `./src/stores`, etc.
+
+index.js:
+```js
+import {Registry} from '@ucd-lib/cork-app-utils';
+
+import ExampleModel from './models/ExampleModel.js';
+import AnotherModel from './models/AnotherModel.js';
+
+// This handles inject of other models into models, avoiding
+// cyclical dependency issues
+Registry.ready();
+
+// then if you want to expose
+// export {ExampleModel, AnotherModel};
+// or
+// if( typeof window !== 'undefined' ) {
+//   window.APP_MODELS = {ExampleModel, AnotherModel};
+// }
 ```
 
 # BaseService
