@@ -1,4 +1,4 @@
-const {BaseStore} = require('@ucd-lib/cork-app-utils');
+import {BaseStore} from '@ucd-lib/cork-app-utils';
 
 class {{name}}Store extends BaseStore {
 
@@ -11,4 +11,5 @@ class {{name}}Store extends BaseStore {
 
 }
 
-module.exports = new {{name}}Store();
+const store = new {{name}}Store();
+export default store;

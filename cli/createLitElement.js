@@ -1,7 +1,11 @@
-const path = require('path');
-const fs = require('fs-extra');
+import path from 'path';
+import fs from 'fs-extra';
+import { fileURLToPath } from 'url';
 
-module.exports = async function(dashName, dir) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default async function(dashName, dir) {
   if( !dir ) {
     dir = process.cwd();
   }

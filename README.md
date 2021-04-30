@@ -39,9 +39,9 @@ elements.
 ### Example Usage
 
 ```javascript
-const {BaseModel} = require('@ucd-lib/cork-app-utils');
-const ExampleStore = require('../stores/ExampleStore');
-const ExampleService = require('../service/ExampleService');
+import {BaseModel} from '@ucd-lib/cork-app-utils';
+import ExampleStore from '../stores/ExampleStore';
+import ExampleService from '../service/ExampleService');
 
 class ExampleModel extends BaseModel {
 
@@ -104,7 +104,8 @@ class ExampleModel extends BaseModel {
   }
 }
 
-module.exports = new ExampleModel();
+const exampleModel = new ExampleModel();
+export default exampleModel;
 ```
 
 # BaseService
@@ -123,8 +124,8 @@ The BaseService exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-const {BaseService} = require('@ucd-lib/cork-app-utils');
-const ExampleStore = require('../stores/ExampleStore');
+import {BaseService} from '@ucd-lib/cork-app-utils');
+import ExampleStore from '../stores/ExampleStore');
 
 class ExampleService extends BaseService {
 
@@ -150,7 +151,8 @@ class ExampleService extends BaseService {
   }
 }
 
-module.exports = new ExampleService();
+const exampleService = new ExampleService();
+export default exampleService;
 ```
 
 # BaseStore
@@ -169,7 +171,7 @@ The ServiceModel exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-const {BaseStore} = require('@ucd-lib/cork-app-utils');
+import {BaseStore} from '@ucd-lib/cork-app-utils';
 
 class ExampleStore extends BaseStore {
 
@@ -219,7 +221,8 @@ class ExampleStore extends BaseStore {
   }
 }
 
-module.exports = new ExampleStore();
+const exampleStore = ExampleStore();
+export default exampleStore;
 ```
 
 
@@ -276,121 +279,6 @@ export default class MyElement extends Mixin(LitElement)
 customElements.define('my-element', MyElement);
 ```
 
-## Polymer 3.0 element (MAINTANCE)
-
-```js
-import {PolymerElement} from "@polymer/polymer"
-
-// sets globals Mixin and EventInterface
-import "@ucd-lib/cork-app-utils";
-
-export default class MyElement extends Mixin(PolymerElement)
-  .with(EventInterface) {
-
-  constructor() {
-    super();
-    this._injectModel('ExampleModel');
-  }
-
-  render(id) {
-    // _getExample added from ExampleInterface
-    let data = await this.ExampleModel.get('someId');
-    // you can do stuff with
-  }
-
-  // EventInterface will automatically wire up this method
-  // to the example-update event.
-  _onExampleUpdate(e) {
-    if( e.state === 'loading' ) {
-
-    } else if( e.state === 'loaded' ) {
-
-    } else if( e.state === 'error' ) {
-
-    }
-  }
-
-  _setExample() {
-    this.ExampleModel.set({
-      my : 'new state'
-    });
-  }
-}
-
-customElements.define('my-element', MyElement);
-```
-
-
-
-# Wiring to UI with Interface (DEPRECATED)
-
-## Model Interface Mixin Class Creation
-
-```js
-
-module.exports = subclass => 
-
-  class ExampleInterface extends subclass {
-
-      constructor() {
-        this._injectModel('ExampleModel');
-      }
-
-      _setExample(update) {
-        this.ExampleModel.update(update);
-      }
-
-      async _getExample(id) {
-        return this.ExampleModel.get(id);
-      }
-
-      // automatically binds element to example-update event.
-      _onExampleUpdate(e) {
-        // implement me
-      }
-  }
-```
-
-## Using mixin with Polymer 3.0 element
-
-```js
-import {PolymerElement} from "@polymer/polymer"
-
-// sets globals Mixin and EventInterface
-import "@ucd-lib/cork-app-utils";
-
-import ExampleInterface from "./interfaces/ExampleInterface"
-
-export default class MyElement extends Mixin(PolymerElement)
-  .with(EventInterface, ExampleInterface) {
-
-  render(id) {
-    // _getExample added from ExampleInterface
-    let data = await this._getExample('someId');
-    // you can do stuff with
-  }
-
-  // EventInterface will automatically wire up this method
-  // to the example-update event.
-  _onExampleUpdate(e) {
-    if( e.state === 'loading' ) {
-
-    } else if( e.state === 'loaded' ) {
-
-    } else if( e.state === 'error' ) {
-
-    }
-  }
-
-  _setExample() {
-    this._setExample({
-      my : 'new state'
-    });
-  }
-}
-
-customElements.define('my-element', MyElement);
-```
 
 # CLI
 

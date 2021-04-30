@@ -1,5 +1,5 @@
-const {BaseService} = require('@ucd-lib/cork-app-utils');
-const {{name}}Store = require('../stores/{{name}}Store');
+import {BaseService} from '@ucd-lib/cork-app-utils';
+import {{name}}Store from '../stores/{{name}}Store.js';
 
 class {{name}}Service extends BaseService {
 
@@ -10,4 +10,5 @@ class {{name}}Service extends BaseService {
 
 }
 
-module.exports = new {{name}}Service();
+const service = new {{name}}Service();
+export default service;

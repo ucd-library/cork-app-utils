@@ -1,6 +1,5 @@
 import { LitElement } from 'lit-element';
-import render from "./{{dashname}}.tpl.js"
-
+import render from "./{{dashname}}.tpl.js";
 
 export default class {{camelname}} extends LitElement {
 

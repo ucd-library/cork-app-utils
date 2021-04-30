@@ -1,5 +1,10 @@
-const path = require('path');
-const fs = require('fs-extra');
+import path from 'path';
+import fs from 'fs-extra';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const tplDir = path.join(__dirname, 'templates');
 
 const defs = [
@@ -17,7 +22,7 @@ const defs = [
   },
 ]
 
-module.exports = async function(name, dir) {
+export default async function(name, dir) {
   if( !dir ) {
     dir = process.cwd();
   }

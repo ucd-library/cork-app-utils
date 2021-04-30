@@ -1,6 +1,6 @@
-const {BaseModel} = require('@ucd-lib/cork-app-utils');
-const {{name}}Service = require('../services/{{name}}Service');
-const {{name}}Store = require('../stores/{{name}}Store');
+import {BaseModel} from '@ucd-lib/cork-app-utils';
+import {{name}}Service from '../services/{{name}}Service.js';
+import {{name}}Store from '../stores/{{name}}Store.js';
 
 class {{name}}Model extends BaseModel {
 
@@ -15,4 +15,5 @@ class {{name}}Model extends BaseModel {
 
 }
 
-module.exports = new {{name}}Model();
+const model = new {{name}}Model();
+export default model;
