@@ -1,12 +1,17 @@
-import { html } from 'lit-element';
+import { html, css } from 'lit';
 
-export default function render() { 
+export function styles() {
+  const elementStyles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  return [elementStyles];
+}
+
+export function render() { 
 return html`
 
-<style>
-  :host {
-    display: block;
-  }
-</style>  
 
 `;}
