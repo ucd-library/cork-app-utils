@@ -1,6 +1,6 @@
 {
   "name": "@ucd-lib/cork-app-utils",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "Base classes for wiring client app code to event framework",
   "type" : "module",
   "main": "index.js",
