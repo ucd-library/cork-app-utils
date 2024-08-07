@@ -1,8 +1,8 @@
 {
   "name": "@ucd-lib/cork-app-utils",
-  "version": "5.1.1",
+  "version": "6.0.0",
   "description": "Base classes for wiring client app code to event framework",
-  "type" : "module",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,7 +14,6 @@
   "license": "MIT",
   "dependencies": {
     "fast-deep-equal": "^2.0.1",
-    "fs-extra": "^7.0.1",
-    "isomorphic-fetch": "^2.2.1"
+    "fs-extra": "^7.0.1"
   }
 }

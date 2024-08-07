@@ -6,6 +6,9 @@
 - [BaseStore](#basestore)
 - [EventBus](#eventbus)
 - [Wiring to UI](#wiring-to-ui)
+- [Logger](#logger)
+  - [Logger Config](#logger-config)
+- [Error Reporting](#error-reporting)
 - [CLI](#cli)
 
 # Install
@@ -201,7 +204,7 @@ The ServiceModel exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-import {BaseStore} from '@ucd-lib/cork-app-utils';
+import {BaseStore, LruStore} from '@ucd-lib/cork-app-utils';
 
 class ExampleStore extends BaseStore {
 
@@ -209,7 +212,7 @@ class ExampleStore extends BaseStore {
     super();
 
     this.data = {
-      byId : {}
+      byId : new LruStore('by-id')
     }
 
     this.events = {
@@ -255,6 +258,29 @@ const exampleStore = ExampleStore();
 export default exampleStore;
 ```
 
+# LruStore
+
+The LruStore is a simple LRU cache store.  It can used in the BaseStore example above.  It is a simple key value store with a max size.  When the max size is reached, the least recently used key is removed.  The timestamp of a key is updated when the key is set or accessed.
+
+## LruStore Config
+
+```js
+{
+  // name of the store.  This is used when logging.
+  name : String,
+
+  // max number of items to store.  defaults to 50
+  maxSize : Number
+}
+```
+
+## LruStore Methods
+
+ - get(key: String)
+   - Get value for key
+ - set(key: String, value: Any)
+   - Set value for key
+
 
 # EventBus
 
@@ -268,9 +294,7 @@ Global instance of EventEmitter class.
 ```js
 import { LitElement } from 'lit-element';
 import render from "./my-element.tpl.js"
-
-// sets globals Mixin and EventInterface
-import "@ucd-lib/cork-app-utils";
+import {Mixin, LitCorkUtils} from "@ucd-lib/cork-app-utils";
 
 export default class MyElement extends Mixin(LitElement)
   .with(LitCorkUtils) {
@@ -279,6 +303,11 @@ export default class MyElement extends Mixin(LitElement)
     super();
     this.render = render.bind(this);
 
+    // if you want a custom logger name call this in the constructor
+    // this._initLogger('foo');
+    // this.logger is always available and defaults to the element name
+
+    // inject the ExampleModel.  Will be available at this.ExampleModel
     this._injectModel('ExampleModel');
   }
 
@@ -307,6 +336,88 @@ export default class MyElement extends Mixin(LitElement)
 }
 
 customElements.define('my-element', MyElement);
+```
+
+# Logger
+
+By default all elements using `LitCorkUtils` will have access to a logger.  The logger provides methods for different log levels; `debug`, `info`, `warn` and `error`.
+
+Setting up the logger.  The logger library provides two functions `getLogger` and `setLoggerConfig`.  `getLogger(name)` takes a name argument and returns to logger with that name.  If not logger exists by that name, a new one is created.  `setLoggerConfig` sets
+the default config for all loggers.
+
+## Logger Config
+
+The loggers config can have the following properties:
+
+```js
+{
+  // default log level for all loggers.  If not provided, they 
+  // will default to 'info'.
+  logLevel : String, 
+
+  // individual logger log level override.  
+  // ex: to override logger 'example' to 'debug', set :
+  // config.logLevels.example = 'debug';
+  logLevels : Object,
+
+  // report errors (both uncaught exceptions on the window and logger.error calls) to a provided url endpoint.
+  reportErrors : {
+    // must be set to true to report
+    enabled : Boolean,
+
+    // urls to call
+    url : String,
+
+    // HTTP Method to use.  Defaults to POST
+    method : String,
+
+    // key to send as `x-api-key` header
+    key : String,
+
+    // custom headers to send in request
+    headers : {}
+  }
+}
+```
+
+There are a couple ways to setup the config.  
+
+  - Manually call `import {setLoggerConfig} from '@ucd-lib/cork-app-utils`.  Then call `setLoggerConfig(config)`;
+  - Set `window.LOGGER_CONFIG_VAR` and then make sure your config is located at `window[window.LOGGER_CONFIG_VAR]`.
+  - Set `window.APP_CONFIG.logger`.
+
+You can update the logLevels at runtime by opening the developer console and setting the `window.logLevels` object.  Example: `window.logLevels.example = 'debug'`;
+
+
+
+# Error Reporting
+
+
+The logger can report; uncaught errors, unhandled promises and logger.error() method calls by setting `reportErrors.enabled` to `true` and provided a `url` to post to.  For more information about a client error reporting service see: https://github.com/ucd-library/client-error-reporter.
+
+By default, the error reporter will POST to the provided url with the following headers and body:
+
+headers:
+```
+Content-Type: application/json
+x-api-key: [key provided in config]
+```
+
+body:
+```js
+{
+  // logger name
+  name : 'String',
+
+  // error object if uncaught error/promise, or arguments array if call to logger.error(). 
+  error : 'Object|Array',
+
+  // current window.location.pathname
+  pathname : 'String'
+
+  // current window.location.search (query params as string)
+  search : 'String'
+}
 ```
 
 
