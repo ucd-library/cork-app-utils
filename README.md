@@ -212,7 +212,7 @@ class ExampleStore extends BaseStore {
     super();
 
     this.data = {
-      byId : new LruStore('by-id')
+      byId : new LruStore({name: 'by-id'})
     }
 
     this.events = {
@@ -375,7 +375,10 @@ The loggers config can have the following properties:
     key : String,
 
     // custom headers to send in request
-    headers : {}
+    headers : {},
+
+    // custom attributes to send in request body
+    customAttributes : {}
   }
 }
 ```
@@ -386,7 +389,7 @@ There are a couple ways to setup the config.
   - Set `window.LOGGER_CONFIG_VAR` and then make sure your config is located at `window[window.LOGGER_CONFIG_VAR]`.
   - Set `window.APP_CONFIG.logger`.
 
-You can update the logLevels at runtime by opening the developer console and setting the `window.logLevels` object.  Example: `window.logLevels.example = 'debug'`;
+You can update the logLevels at runtime by opening the developer console and setting the `window.logLevels` object.  Example: `window.logLevels.example = 'debug'`.  Alternatively, you can set the `?loglevels=` query param in the URL to override log levels from page load.  Example: `?loglevels=example:debug,my-element:info`.;
 
 
 
