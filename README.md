@@ -377,6 +377,10 @@ The loggers config can have the following properties:
     // custom headers to send in request
     headers : {},
 
+    // full url or full path to the bundles source map file
+    // this is used to map stack traces to the original source
+    sourceMapUrl : String,
+
     // custom attributes to send in request body
     customAttributes : {}
   }
