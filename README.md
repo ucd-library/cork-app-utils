@@ -381,6 +381,11 @@ The loggers config can have the following properties:
     // this is used to map stack traces to the original source
     sourceMapUrl : String,
 
+    // extension of the source map file.  Example to '.map'
+    // when set the source map url will be the url of the error
+    // plus this extension
+    sourceMapExtension : String,
+
     // custom attributes to send in request body
     customAttributes : {}
   }
