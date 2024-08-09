@@ -360,6 +360,9 @@ The loggers config can have the following properties:
   // config.logLevels.example = 'debug';
   logLevels : Object,
 
+  // if true, the logger will not include caller method and source link in log messages
+  disbableCallerInfo : Boolean,
+
   // report errors (both uncaught exceptions on the window and logger.error calls) to a provided url endpoint.
   reportErrors : {
     // must be set to true to report
@@ -398,8 +401,17 @@ There are a couple ways to setup the config.
   - Set `window.LOGGER_CONFIG_VAR` and then make sure your config is located at `window[window.LOGGER_CONFIG_VAR]`.
   - Set `window.APP_CONFIG.logger`.
 
-You can update the logLevels at runtime by opening the developer console and setting the `window.logLevels` object.  Example: `window.logLevels.example = 'debug'`.  Alternatively, you can set the `?loglevels=` query param in the URL to override log levels from page load.  Example: `?loglevels=example:debug,my-element:info`.;
+You can update config in realtime by setting window variables or url query params.
 
+  - logLevel:
+    - `?loglevel=debug` 
+    - `window.logLevel = 'debug'`
+  - logLevels:
+    - `?loglevels=example:debug,my-element:info`
+    - `window.logLevels.example = 'debug';`
+  - disbableCallerInfo:
+    - `?disableCallerInfo=true`
+    - `window.disableLoggerCallerInfo = true;`
 
 
 # Error Reporting
