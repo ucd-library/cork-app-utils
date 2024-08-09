@@ -361,7 +361,7 @@ The loggers config can have the following properties:
   logLevels : Object,
 
   // if true, the logger will not include caller method and source link in log messages
-  disbableCallerInfo : Boolean,
+  disableCallerInfo : Boolean,
 
   // report errors (both uncaught exceptions on the window and logger.error calls) to a provided url endpoint.
   reportErrors : {
@@ -409,7 +409,7 @@ You can update config in realtime by setting window variables or url query param
   - logLevels:
     - `?loglevels=example:debug,my-element:info`
     - `window.logLevels.example = 'debug';`
-  - disbableCallerInfo:
+  - disableCallerInfo:
     - `?disableCallerInfo=true`
     - `window.disableLoggerCallerInfo = true;`
 
