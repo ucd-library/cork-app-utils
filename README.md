@@ -340,14 +340,29 @@ customElements.define('my-element', MyElement);
 
 # Logger
 
-By default all elements using `LitCorkUtils` will have access to a logger.  The logger provides methods for different log levels; `debug`, `info`, `warn` and `error`.
+By default all elements using `LitCorkUtils` will have access to a logger.  The logger provides methods for different log levels; `debug`, `info`, `warn` and `error`:
 
-Setting up the logger.  The logger library provides two functions `getLogger` and `setLoggerConfig`.  `getLogger(name)` takes a name argument and returns to logger with that name.  If not logger exists by that name, a new one is created.  `setLoggerConfig` sets
-the default config for all loggers.
+```js
+export default class MyElement extends Mixin(LitElement)
+  .with(LitCorkUtils) {
 
-## Logger Config
+    constructor() {
+      super();
 
-The loggers config can have the following properties:
+      this.logger.debug('i am firing from the constructor!')
+    }
+
+  }
+```
+
+## Setting up the logger  
+The logger library provides two functions:
+- `getLogger(name)` takes a name argument and returns a logger with that name. If a logger does not already exist by that name, a new one is created.  
+- `setLoggerConfig` sets the default config for all loggers.
+
+### Logger Config
+
+The logger's config can have the following properties:
 
 ```js
 {
@@ -414,7 +429,7 @@ You can update config in realtime by setting window variables or url query param
     - `window.disableLoggerCallerInfo = true;`
 
 
-# Error Reporting
+## Error Reporting
 
 
 The logger can report; uncaught errors, unhandled promises and logger.error() method calls by setting `reportErrors.enabled` to `true` and provided a `url` to post to.  For more information about a client error reporting service see: https://github.com/ucd-library/client-error-reporter.
