@@ -7,10 +7,12 @@ import EventBus from './lib/EventBus.js';
 import Registry from './lib/Registry.js';
 import LitCorkUtils from './lib/LitCorkUtils.js';
 import LruStore from './lib/lru-store.js';
+import PayloadUtils from './lib/PayloadUtils.js';
 import {getLogger, setLoggerConfig} from './lib/logger.js';
 
 export {
   BaseModel, BaseStore, BaseService,
   BaseMixin, Mixin, EventBus, LitCorkUtils,
-  Registry, LruStore, getLogger, setLoggerConfig
+  Registry, LruStore, getLogger, setLoggerConfig,
+  PayloadUtils
 };
