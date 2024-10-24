@@ -11,17 +11,18 @@ import PayloadUtils from './lib/PayloadUtils.js';
 import {getLogger, setLoggerConfig} from './lib/logger.js';
 import {setGlobal} from './lib/globals.js';
 import STATES from './lib/states.js';
+import digest from './lib/digest.js';
 
 setGlobal('lib', {
   BaseModel, BaseStore, BaseService,
   BaseMixin, Mixin, EventBus, LitCorkUtils,
   Registry, LruStore, getLogger, setLoggerConfig,
-  PayloadUtils, STATES
+  PayloadUtils, STATES, digest
 })
 
 export {
   BaseModel, BaseStore, BaseService,
   BaseMixin, Mixin, EventBus, LitCorkUtils,
   Registry, LruStore, getLogger, setLoggerConfig,
-  PayloadUtils, STATES
+  PayloadUtils, STATES, digest
 };
