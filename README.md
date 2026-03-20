@@ -44,7 +44,7 @@ elements.
 ```javascript
 import {BaseModel} from '@ucd-lib/cork-app-utils';
 import ExampleStore from '../stores/ExampleStore';
-import ExampleService from '../service/ExampleService');
+import ExampleService from '../service/ExampleService';
 
 class ExampleModel extends BaseModel {
 
@@ -70,47 +70,25 @@ class ExampleModel extends BaseModel {
    * using our service.  The service may return some
    * data already cached in the store.  The returned 
    * data will be in a State Payload Wrapper.
+   * In most cases, we simply need to call the service
    *
    * @returns {Promise}
    */
   async get(id) {
-    // get current state
-    let state = this.store.get(id);
-
-    // wait for the service to do it's thing
-    // if you are interested in the loading events
-    // you will want to set event listeners
-    try {
-
-      // check to see if we are already loading this resource
-      if( state.state === 'loading' ) {
-        // make sure you store the request promise in the store as 'request'
-        // then you can await here on it as a semaphore, preventing duplicate 
-        // requests if multiple UI elements request a resource at the same time
-        await state.request;
-      } else {
-        // the return from the service is the network respons
-        // not the state response which is stored in the store
-        await this.service.get(id);
-      }
-
-    } catch(e) {
-      // handle network error here if you want to handle in model
-      // but error state should be capture by store and UI elements 
-      // should react to the error state event
-    }
-
-    // regardless of the network success/failure of request above
-    // return the current state
-    return this.store.get(id);
+    return this.service.get()
   }
 
   /**
    * @method set
-   * @description Update some app state
+   * @description Update some app data
    */
-  set(data) {
-    this.store.update(data)
+  async set(data) {
+    const res = await this.store.update(data);
+    if ( res.state === 'loaded' ) {
+      // clear relevant caches here
+      this.store.data.byId.purge();
+    }
+    return res;
   }
 }
 
@@ -139,6 +117,8 @@ Registry.ready();
 // if( typeof window !== 'undefined' ) {
 //   window.APP_MODELS = {ExampleModel, AnotherModel};
 // }
+// or
+// access via registry.models
 ```
 
 # BaseService
@@ -157,8 +137,11 @@ The BaseService exposes helper functions to call rest services
 ### Example Usage
 
 ```javascript
-import {BaseService} from '@ucd-lib/cork-app-utils');
-import ExampleStore from '../stores/ExampleStore');
+import {BaseService} from '@ucd-lib/cork-app-utils';
+import ExampleStore from '../stores/ExampleStore';
+
+import payload from './payload.js';
+import { digest } from '@ucd-lib/cork-app-utils';
 
 class ExampleService extends BaseService {
 
@@ -169,23 +152,70 @@ class ExampleService extends BaseService {
   }
 
   async get(id) {
-    return this.request({
-      url : `/api/get/${id}`,
-      // optional
-      // if the state is 'loading' and another request for this object
-      // comes in, both requests will wait on the same promise preventing
-      // two network requests for the same object
-      checkCached : () => this.store.data.byId[id],
-      // request is a promise to resolves when network request finished (success or failure)
-      onLoading : request => this.store.setLoading(id, request),
-      onLoad : result => this.store.setLoaded(id, result.body),
-      onError : e => this.store.setError(id, e)
-    });
+    // LruStore where the data will be written
+    const store = this.store.data.byId;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `/api/get/${id}`,
+        // if request has been made before, will return cached version
+        // exclude if you never want to get cached data
+        checkCached : () => store.get(id),
+
+        // preferred pattern is to use onUpdate callback which automatically
+        // sets the correct state (loading, loaded, error)
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store
+        ),
+
+        // instead of onUpdate, you can manually handle state with the following callbacks
+        // for advanced use cases only. Requires creating custom handlers in the store.
+        onLoading : request => this.store.setLoading(id, request),
+        onLoad : result => this.store.setLoaded(id, result.body),
+        onError : e => this.store.setError(id, e)
+      })
+    );
+    return store.get(id);
   }
+
+  /**
+   * Requests are saved/accessed in the store by a unique id.
+   * cork-app-utils has built-in methods for generating an id from an object
+   */
+  async query(query={}){
+    // option 1, for large queries
+    let id = await digest(query);
+
+    // option 2, if you know the keys that will be in the query and there are a limited number
+    const id = payload.getKey(query);
+    // then in this.request do:
+    // onUpdate : resp => this.store.set(
+    //   payload.generate(ido, resp),
+    //   store
+    // )
+  }
+
+  // continue doing normal checkRequesting/this.request here
 }
 
 const exampleService = new ExampleService();
 export default exampleService;
+```
+
+```js
+//payload.js
+import {PayloadUtils} from '@ucd-lib/cork-app-utils'
+
+const ID_ORDER = ['org', 'name', 'other keys you know to exist'];
+
+let inst = new PayloadUtils({
+  idParts: ID_ORDER
+});
+
+export default inst;
+
 ```
 
 # BaseStore
@@ -212,14 +242,18 @@ class ExampleStore extends BaseStore {
     super();
 
     this.data = {
+      // will automatically create an event based on name:
+      // name.replace(/[\s\._]/g, '-').toLowerCase()+ '-update';
+      // will be emitted if using the onUpdate callback in service.request
       byId : new LruStore({name: 'by-id'})
     }
 
     this.events = {
-      EXAMPLE_UPDATE = 'example-update'
+      EXAMPLE_CUSTOM_UPDATE = 'example-custom-update'
     }
   }
 
+  // If not using onUpdate callback in service.request, you have to set up state handlers:
   // request is the network request promise
   // always store this so we can wait on it if a second
   // entity requests this same resource
@@ -249,8 +283,12 @@ class ExampleStore extends BaseStore {
     // this is helpful to prevent multiple events of same state that sometimes occur
     // if( !this.stateChanged(this.data.byId[id], state) ) return;
 
-    this.data.byId[id] = state
-    this.emit(this.events.EXAMPLE_UPDATE, state);
+    const store = this.data.byId;
+    store[id] = state
+    this.emit(store.name.replace(/[\s\._]/g, '-').toLowerCase() + '-update', state);
+
+    // or emit a custom event
+    this.emit('example-custom-update', state)
   }
 }
 
@@ -280,6 +318,8 @@ The LruStore is a simple LRU cache store.  It can used in the BaseStore example 
    - Get value for key
  - set(key: String, value: Any)
    - Set value for key
+ - purge()
+   - remove all items
 
 
 # EventBus
@@ -313,12 +353,14 @@ export default class MyElement extends Mixin(LitElement)
 
   showData(id) {
     let data = await this.ExampleModel.get('someId');
-    // you can do stuff with
+    if ( data.state === 'loaded' ){
+      // you can do stuff with data here
+    }
   }
 
-  // LitCorkUtils will automatically wire up this method
-  // to the example-update event.
-  _onExampleUpdate(e) {
+  // LitCorkUtils will automatically create callback methods for every event in the store when the model is injected
+  // for example the example-custom-update event:
+  _onExampleCustomUpdate(e) {
     if( e.state === 'loading' ) {
 
     } else if( e.state === 'loaded' ) {
