@@ -9,6 +9,9 @@
 - [Logger](#logger)
   - [Logger Config](#logger-config)
 - [Error Reporting](#error-reporting)
+- [LruStore](#lrustore)
+- [Caching](#caching)
+  - [clearCache](#clearcache)
 - [CLI](#cli)
 
 # Install
@@ -320,6 +323,84 @@ The LruStore is a simple LRU cache store.  It can used in the BaseStore example 
    - Set value for key
  - purge()
    - remove all items
+
+
+# Caching
+
+Caching in cork-app-utils is handled by [LruStore](#lrustore) instances attached to each model's store, and data will only be automatically deleted after it exceeds the `maxSize` parameter. When you need to invalidate caches manually — such as after a POST request — use `clearCache`.
+
+## clearCache
+
+```js
+import { clearCache } from '@ucd-lib/cork-app-utils';
+```
+
+### Parameters
+
+`clearCache(opts={})`
+
+| Option | Type | Description |
+|---|---|---|
+| `target` | `Array<{model, store?}>` | Explicit list of model/store pairs to clear.  If `store` is omitted, all LruStores in that model are cleared.  When `target` is provided, `skipModels` and `skipStores` are ignored. |
+| `skipModels` | `Array<string>` | Model names to skip.  Only used when `target` is not set. |
+| `skipStores` | `Array<string>` | Store names (LruStore `name` property) to skip.  Only used when `target` is not set. |
+
+When called with no arguments, all LruStores across all registered models are cleared.
+
+### Examples
+
+```js
+// clear everything
+clearCache();
+
+// clear all stores in a single model
+clearCache({ target: [{ model: 'ExampleModel' }] });
+
+// clear one specific store in a model
+clearCache({ target: [{ model: 'ExampleModel', store: 'by-id' }] });
+
+// clear everything except certain models
+clearCache({ skipModels: ['AuthModel'] });
+
+// clear everything except certain stores
+clearCache({ skipStores: ['by-id'] });
+```
+
+You will likely want to set up a wrapper function in your application in order to automatically skip certain models/stores:
+
+```js
+import { clearCache } from '@ucd-lib/cork-app-utils';
+
+export default function clearCache(opts={}){
+  const defaultOpts = { skipModels: ['IconModel', 'AppStateModel'] };
+  clearCache({ ...defaultOpts, ...opts });
+  }
+```
+
+and then in your model:
+
+```js
+import clearCache from './clear-cache.js'
+
+class ExampleModel extends BaseModel {
+
+  async createFoo(data){
+    const r = await this.service.createFoo(data);
+    if ( r.state === 'loaded'){
+
+      // clear a specific store
+      clearCache({target: 'ExampleModel', store: 'foo.list'});
+
+      // for more complicated apps with a lot of dependencies between data objects, just blow out the whole cache and save yourself the headache
+      clearCache();
+    }
+
+    return r;
+  }
+}
+
+
+```
 
 
 # EventBus
